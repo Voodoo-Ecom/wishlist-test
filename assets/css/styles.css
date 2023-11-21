@@ -14,11 +14,19 @@
 
 /* Common */
 body {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-height: 100vh;
   font-family: var(--primary-font);
   font-size: 14px;
   line-height: 1.43;
   color: var(--first-primary-color);
   background-color: var(--bg-primary);
+}
+
+main {
+  flex-grow: 2;
 }
 
 a {
