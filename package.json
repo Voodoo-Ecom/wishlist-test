@@ -1,0 +1,17 @@
+{
+  "devDependencies": {
+    "eslint": "^8.51.0",
+    "stylelint": "^15.11.0",
+    "stylelint-config-standard": "^34.0.0",
+    "stylelint-order": "^6.0.3"
+  },
+  "scripts": {
+    "lint:js": "eslint assets/*.js",
+    "lint:css": "stylelint \"./assets/**/*.{css,scss}\"",
+    "lint": "npm run lint:js && npm run lint:css"
+  },
+  "dependencies": {
+    "stylelint-declaration-block-no-ignored-properties": "^2.7.0",
+    "stylelint-selector-bem-pattern": "^3.0.1"
+  }
+}
