@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Cats</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/modern-normalize/2.0.0/modern-normalize.min.css"
     integrity="sha512-4xo8blKMVCiXpTaLzQSLSw3KFOVPWhm/TRtuPVc4WG6kUgjH6J03IBuG7JZPkcWMxJ5huwaBpOpnwYElP/m6wg=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -11,15 +14,125 @@
 </head>
 <body>
   <header class="header">
-    <nav class="header__navigation">
-      <a class="header__logo-link" href="/">Cats!</a>
-    </nav>
-    <div class="header__favorites">
-      <div class="header__favorites-counter-wrap">
-        <span class="header__favorites-counter">4</span>
+    <div class="container">
+      <nav class="header__navigation">
+        <a class="header__logo-link" href="/">Cats!</a>
+      </nav>
+      <div class="header__favorites">
+        <div class="header__favorites-counter-wrap">
+          <span class="header__favorites-counter">4</span>
+        </div>
+        <span class="header__favorites-text">Favorites</span>
       </div>
-      <span class="header__favorites-text">Favorites</span>
     </div>
   </header>
+  <main>
+    <section class="cats">
+      <div class="container">
+        <button class="cats__reset-btn">Reset</button>
+        <ul class="cats__list">
+          <li class="cats__item">
+            <div class="cats__image-wrapper">
+              <img class="cats__image"
+                src="https://hips.hearstapps.com/hmg-prod/images/beautiful-smooth-haired-red-cat-lies-on-the-sofa-royalty-free-image-1678488026.jpg?crop=0.88847xw:1xh;center,top&resize=1200:*"
+                alt="cat" width="272" height="122">
+              <button class="cats__like-btn"></button>
+            </div>
+            <div class="cats__info-wrapper">
+              <h3 class="cats__title">Lorem ipsum</h3>
+              <p class="cats__description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sit fermentum a accumsan,
+                consequat vitae arcu velit, nunc,
+                suspendisse.</p>
+            </div>
+          </li>
+          <li class="cats__item">
+            <div class="cats__image-wrapper">
+              <img class="cats__image"
+                src="https://hips.hearstapps.com/hmg-prod/images/beautiful-smooth-haired-red-cat-lies-on-the-sofa-royalty-free-image-1678488026.jpg?crop=0.88847xw:1xh;center,top&resize=1200:*"
+                alt="cat" width="272" height="122">
+              <button class="cats__like-btn"></button>
+            </div>
+            <div class="cats__info-wrapper">
+              <h3 class="cats__title">Lorem ipsum</h3>
+              <p class="cats__description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sit fermentum a accumsan,
+                consequat vitae arcu velit, nunc,
+                suspendisse.</p>
+            </div>
+          </li>
+          <li class="cats__item">
+            <div class="cats__image-wrapper">
+              <img class="cats__image"
+                src="https://hips.hearstapps.com/hmg-prod/images/beautiful-smooth-haired-red-cat-lies-on-the-sofa-royalty-free-image-1678488026.jpg?crop=0.88847xw:1xh;center,top&resize=1200:*"
+                alt="cat" width="272" height="122">
+              <button class="cats__like-btn"></button>
+            </div>
+            <div class="cats__info-wrapper">
+              <h3 class="cats__title">Lorem ipsum</h3>
+              <p class="cats__description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sit fermentum a accumsan,
+                consequat vitae arcu velit, nunc,
+                suspendisse.</p>
+            </div>
+          </li>
+          <li class="cats__item">
+            <div class="cats__image-wrapper">
+              <img class="cats__image"
+                src="https://hips.hearstapps.com/hmg-prod/images/beautiful-smooth-haired-red-cat-lies-on-the-sofa-royalty-free-image-1678488026.jpg?crop=0.88847xw:1xh;center,top&resize=1200:*"
+                alt="cat" width="272" height="122">
+              <button class="cats__like-btn"></button>
+            </div>
+            <div class="cats__info-wrapper">
+              <h3 class="cats__title">Lorem ipsum</h3>
+              <p class="cats__description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sit fermentum a accumsan,
+                consequat vitae arcu velit, nunc,
+                suspendisse.</p>
+            </div>
+          </li>
+          <li class="cats__item">
+            <div class="cats__image-wrapper">
+              <img class="cats__image"
+                src="https://hips.hearstapps.com/hmg-prod/images/beautiful-smooth-haired-red-cat-lies-on-the-sofa-royalty-free-image-1678488026.jpg?crop=0.88847xw:1xh;center,top&resize=1200:*"
+                alt="cat" width="272" height="122">
+              <button class="cats__like-btn liked"></button>
+            </div>
+            <div class="cats__info-wrapper">
+              <h3 class="cats__title">Lorem ipsum</h3>
+              <p class="cats__description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sit fermentum a accumsan,
+                consequat vitae arcu velit, nunc,
+                suspendisse.</p>
+            </div>
+          </li>
+          <li class="cats__item">
+            <div class="cats__image-wrapper">
+              <img class="cats__image"
+                src="https://hips.hearstapps.com/hmg-prod/images/beautiful-smooth-haired-red-cat-lies-on-the-sofa-royalty-free-image-1678488026.jpg?crop=0.88847xw:1xh;center,top&resize=1200:*"
+                alt="cat" width="272" height="122">
+              <button class="cats__like-btn"></button>
+            </div>
+            <div class="cats__info-wrapper">
+              <h3 class="cats__title">Lorem ipsum</h3>
+              <p class="cats__description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sit fermentum a accumsan,
+                consequat vitae arcu velit, nunc,
+                suspendisse.</p>
+            </div>
+          </li>
+          <li class="cats__item">
+            <div class="cats__image-wrapper">
+              <img class="cats__image"
+                src="https://hips.hearstapps.com/hmg-prod/images/beautiful-smooth-haired-red-cat-lies-on-the-sofa-royalty-free-image-1678488026.jpg?crop=0.88847xw:1xh;center,top&resize=1200:*"
+                alt="cat" width="272" height="122">
+              <button class="cats__like-btn"></button>
+            </div>
+            <div class="cats__info-wrapper">
+              <h3 class="cats__title">Lorem ipsum</h3>
+              <p class="cats__description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sit fermentum a accumsan,
+                consequat vitae arcu velit, nunc,
+                suspendisse.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+  </main>
+  <footer class="footer"></footer>
 </body>
 </html>
