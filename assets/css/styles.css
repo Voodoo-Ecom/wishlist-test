@@ -4,7 +4,6 @@
   --bg-primary: #E0E0E0;
   --bg-secondary: #B6B6B6;
   --border-color: #4F4F4F;
-  --accent-color: #96CAAF;
   --white: #FFF;
   --black: #000;
   --border-radius: 4px;
@@ -70,10 +69,6 @@ img {
 ul {
   padding-left: 0;
   list-style: none;
-}
-
-.is-hidden {
-  display: none;
 }
 
 .container {
@@ -296,6 +291,10 @@ ul {
   align-items: center;
   justify-content: center;
   margin-top: 32px;
+}
+
+.pagination.is-hidden {
+  display: none;
 }
 
 .pagination__item {

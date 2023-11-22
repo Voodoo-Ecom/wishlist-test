@@ -33,12 +33,12 @@
         wishlistCounter: '.header__favorites-counter',
       },
       functions: {
-        getPaginationEl: () => document.getElementById(wishlistManager.dom.selectors.paginationId),
-        getResetBtnEl: () => document.getElementById(wishlistManager.dom.selectors.resetButtonId),
         getCatsCardList: () => document.querySelector(wishlistManager.dom.selectors.catsCardList),
         getLikeBtnByCatId: (catId) =>
           document.getElementById(catId).querySelector(wishlistManager.dom.selectors.likeBtn),
         getLikedButtonsElems: () => document.querySelectorAll(wishlistManager.dom.selectors.activeLikedBtn),
+        getPaginationEl: () => document.getElementById(wishlistManager.dom.selectors.paginationId),
+        getResetBtnEl: () => document.getElementById(wishlistManager.dom.selectors.resetButtonId),
         getWishlistCounterEl: () => document.querySelector(wishlistManager.dom.selectors.wishlistCounter),
         createCatsListMarkup: (cats) => {
           const listMarkup = cats.reduce((markup, cat) => {
@@ -104,21 +104,25 @@
 
           wishlistManager.dom.functions.getPaginationEl().innerHTML = markup;
         },
-        renderList: async () => {
-          const page = wishlistManager.functions.pagination.getCurrentPageFromSearchParams();
-          const cats = await wishlistManager.catsApi.getAllCats(page);
-          const markup = wishlistManager.dom.functions.createCatsListMarkup(cats);
-          wishlistManager.dom.functions.getCatsCardList().innerHTML = markup;
-        },
         renderCatsInWishlistQuantity: () => {
           const wishlistCounterEl = wishlistManager.dom.functions.getWishlistCounterEl();
           wishlistCounterEl.innerText = wishlistManager.functions.wishlist.getQuantityOfCatsInLocalStorage()
             ? wishlistManager.functions.wishlist.getQuantityOfCatsInLocalStorage()
             : '';
         },
+        renderList: async () => {
+          const page = wishlistManager.functions.pagination.getCurrentPageFromSearchParams();
+          const cats = await wishlistManager.catsApi.getAllCats(page);
+          wishlistManager.dom.functions.showPagination();
+          const markup = wishlistManager.dom.functions.createCatsListMarkup(cats);
+          wishlistManager.dom.functions.getCatsCardList().innerHTML = markup;
+        },
         resetLikes: () => {
           const likedButtonsElems = wishlistManager.dom.functions.getLikedButtonsElems();
           likedButtonsElems.forEach((btn) => btn.classList.remove('liked'));
+        },
+        showPagination: () => {
+          wishlistManager.dom.functions.getPaginationEl().classList.remove('is-hidden');
         },
       },
     },
@@ -177,7 +181,8 @@
           Math.ceil(wishlistManager.cfg.totalCatsCountFromAPI / wishlistManager.cfg.catsPerPageLimit),
         getCurrentPageFromSearchParams: () => {
           const searchParams = new URLSearchParams(document.location.search);
-          return Number(searchParams.get('page'));
+          const currentPage = Number(searchParams.get('page')) ? Number(searchParams.get('page')) : 1;
+          return currentPage;
         },
         setCurrentPageToSearchParams: (page) => {
           const searchParams = new URLSearchParams(window.location.search);
