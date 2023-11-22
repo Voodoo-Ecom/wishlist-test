@@ -41,13 +41,15 @@
         getResetBtnEl: () => document.getElementById(wishlistManager.dom.selectors.resetButtonId),
         getWishlistCounterEl: () => document.querySelector(wishlistManager.dom.selectors.wishlistCounter),
         createCatsListMarkup: (cats) => {
-          const listMarkup = cats.reduce((markup, cat) => {
+          const listMarkup = cats.reduce((markup, cat, index) => {
             const { id, url } = cat;
             const { name, description } = cat.breeds[0];
             const likedClassName = wishlistManager.functions.wishlist.checkIfCatIsInLocalStorage(id) ? 'liked' : '';
             const cardMarkup = `<li class="cats__item" id=${id}>
               <div class="cats__image-wrapper">
                 <img class="cats__image"
+                  ${index >= 2 ? 'loading="lazy"' : ''}
+                  ${index < 2 ? 'fetchPriority="hign"' : ''}
                   src="${url}"
                   alt="cat" width="272" height="122">
                 <button class="cats__like-btn ${likedClassName}"></button>
