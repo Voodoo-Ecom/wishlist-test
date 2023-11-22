@@ -1,196 +1,221 @@
-const cardListEl = document.querySelector('.cats__list');
-const resetButtonEl = document.getElementById('reset-button');
+(function () {
+  const wishlistManager = {
+    cfg: {
+      API_KEY: 'live_ST09boZt58lcEhnCapTTn4JAcUEB72aRfAuLhpU5pxAiAImePNDmuCEvlyaNB56Q',
+      BASE_URL: 'https://api.thecatapi.com/v1/images/search',
+      totalCatsCountFromAPI: 100,
+      maxPaginationBtnNumber: 7,
+      catsPerPageLimit: 12,
+    },
+    catsApi: {
+      getAllCats: async (page = 1) => {
+        try {
+          const catsData = [];
+          const res = await fetch(
+            `${wishlistManager.cfg.BASE_URL}?limit=${wishlistManager.cfg.catsPerPageLimit}&page=${page}&order=ASC&has_breeds=1&api_key=${wishlistManager.cfg.API_KEY}`
+          );
+          const data = await res.json();
+          catsData.push(...data);
+          return catsData;
+        } catch (error) {
+          console.error('Error occured on fetching products:', error);
+          return null;
+        }
+      },
+    },
+    dom: {
+      functions: {
+        getPaginationEl: () => document.getElementById(wishlistManager.dom.selectors.paginationId),
+        getResetBtnEl: () => document.getElementById(wishlistManager.dom.selectors.resetButtonId),
+        getCatsCardList: () => document.querySelector(wishlistManager.dom.selectors.catsCardList),
+        getLikeBtnByCatId: (catId) =>
+          document.getElementById(catId).querySelector(wishlistManager.dom.selectors.likeBtn),
+        getLikedButtonsElems: () => document.querySelectorAll(wishlistManager.dom.selectors.activeLikedBtn),
+        getWishlistCounterEl: () => document.querySelector(wishlistManager.dom.selectors.wishlistCounter),
+        createCatsListMarkup: (cats) => {
+          const listMarkup = cats.reduce((markup, cat) => {
+            const { id, url } = cat;
+            const { name, description } = cat.breeds[0];
+            const likedClassName = wishlistManager.functions.wishlist.checkIfCatIsInLocalStorage(id) ? 'liked' : '';
+            const cardMarkup = `<li class="cats__item" id=${id}>
+              <div class="cats__image-wrapper">
+                <img class="cats__image"
+                  src="${url}"
+                  alt="cat" width="272" height="122">
+                <button class="cats__like-btn ${likedClassName}"></button>
+              </div>
+              <div class="cats__info-wrapper">
+                <h3 class="cats__title">${name}</h3>
+                <p class="cats__description">${description}</p>
+              </div>
+            </li>`;
 
-// API
-const BASE_URL = 'https://api.thecatapi.com/v1/images/search';
-const API_KEY = 'live_ST09boZt58lcEhnCapTTn4JAcUEB72aRfAuLhpU5pxAiAImePNDmuCEvlyaNB56Q';
-const limit = 12;
+            return (markup += cardMarkup);
+          }, '');
 
-const getAllCats = async (page = 1) => {
-  try {
-    const catsData = [];
-    const res = await fetch(`${BASE_URL}?limit=${limit}&page=${page}&order=ASC&has_breeds=1&api_key=${API_KEY}`);
-    const data = await res.json();
-    catsData.push(...data);
-    return catsData;
-  } catch (error) {
-    console.error('Error occured on fetching products:', error);
-    return null;
-  }
-};
+          return listMarkup;
+        },
+        createPaginationBtnMarkup: (pageNumber) => {
+          const currentPage = wishlistManager.functions.pagination.getCurrentPageFromSearchParams();
+          return `<li class="pagination__item">
+            <button data-page="${pageNumber}" class="${pageNumber === currentPage ? 'active' : ''} pagination__button">
+              ${pageNumber}
+            </button>
+          </li>`;
+        },
+        createGapPaginationBtnMarkup: () => '<li class="pagination__item">...</li>',
+        createPaginationMarkup: () => {
+          let markup = '';
+          const currentPage = wishlistManager.functions.pagination.getCurrentPageFromSearchParams();
+          const numberOfBtns = wishlistManager.functions.pagination.getNumberOfBtns();
+          const maxPaginationBtnNumber = wishlistManager.cfg.maxPaginationBtnNumber;
+          const gapPaginationBtnMarkup = wishlistManager.dom.functions.createGapPaginationBtnMarkup();
+          const createBtnMarkup = wishlistManager.dom.functions.createPaginationBtnMarkup;
 
-// MARKUP
-const createCatsListMarkup = (cats) => {
-  const listMarkup = cats.reduce((markup, cat) => {
-    const { id, url } = cat;
-    const { name, description } = cat.breeds[0];
-    const likedClassName = checkIfCatIsInLocalStorage(id) ? 'liked' : '';
+          if (numberOfBtns <= maxPaginationBtnNumber) {
+            for (let i = 1; i <= numberOfBtns; i += 1) {
+              markup += createBtnMarkup(i);
+            }
+          } else if (currentPage < maxPaginationBtnNumber - 2) {
+            for (let i = 1; i <= maxPaginationBtnNumber - 2; i += 1) {
+              markup += createBtnMarkup(i);
+            }
+            markup += gapPaginationBtnMarkup + createBtnMarkup(numberOfBtns);
+          } else if (currentPage > numberOfBtns - maxPaginationBtnNumber + 3) {
+            markup += createBtnMarkup(1) + gapPaginationBtnMarkup;
+            for (let i = numberOfBtns - maxPaginationBtnNumber + 3; i <= numberOfBtns; i += 1) {
+              markup += createBtnMarkup(i);
+            }
+          } else {
+            markup += createBtnMarkup(1) + gapPaginationBtnMarkup;
+            for (let i = currentPage - 1; i <= currentPage + 1; i += 1) {
+              markup += createBtnMarkup(i);
+            }
+            markup += gapPaginationBtnMarkup + createBtnMarkup(numberOfBtns);
+          }
 
-    const cardMarkup = `<li class="cats__item" id=${id}>
-      <div class="cats__image-wrapper">
-        <img class="cats__image"
-          src="${url}"
-          alt="cat" width="272" height="122">
-        <button class="cats__like-btn ${likedClassName}"></button>
-      </div>
-      <div class="cats__info-wrapper">
-        <h3 class="cats__title">${name}</h3>
-        <p class="cats__description">${description}</p>
-      </div>
-    </li>`;
+          wishlistManager.dom.functions.getPaginationEl().innerHTML = markup;
+        },
+        renderList: async () => {
+          const page = wishlistManager.functions.pagination.getCurrentPageFromSearchParams();
+          const cats = await wishlistManager.catsApi.getAllCats(page);
+          const markup = wishlistManager.dom.functions.createCatsListMarkup(cats);
+          wishlistManager.dom.functions.getCatsCardList().innerHTML = markup;
+        },
+        renderCatsInWishlistQuantity: () => {
+          const wishlistCounterEl = wishlistManager.dom.functions.getWishlistCounterEl();
+          wishlistCounterEl.innerText = wishlistManager.functions.wishlist.getQuantityOfCatsInLocalStorage()
+            ? wishlistManager.functions.wishlist.getQuantityOfCatsInLocalStorage()
+            : '';
+        },
+        resetLikes: () => {
+          const likedButtonsElems = wishlistManager.dom.functions.getLikedButtonsElems();
+          likedButtonsElems.forEach((btn) => btn.classList.remove('liked'));
+        },
+      },
+      selectors: {
+        catsCardList: '.cats__list',
+        paginationId: 'pagination',
+        wishlistCounter: '.header__favorites-counter',
+        activeLikedBtn: '.liked',
+        resetButtonId: 'reset-button',
+        likeBtn: '.cats__like-btn',
+      },
+    },
+    functions: {
+      wishlist: {
+        addCatToLocalStorage: (catId) => {
+          const catsInWishlistIds = wishlistManager.functions.wishlist.getCatsFromLocalStorage();
+          if (catsInWishlistIds.find((likedCatId) => likedCatId === catId)) return;
 
-    return (markup += cardMarkup);
-  }, '');
+          const catCardEl = wishlistManager.dom.functions.getLikeBtnByCatId(catId);
+          catCardEl.classList.add('liked');
+          localStorage.setItem('catsInWishlist', JSON.stringify([...catsInWishlistIds, catId]));
+          wishlistManager.dom.functions.renderCatsInWishlistQuantity();
+        },
+        checkIfCatIsInLocalStorage: (catId) => {
+          const catsInWishlistIds = wishlistManager.functions.wishlist.getCatsFromLocalStorage();
+          return catsInWishlistIds.find((likedCatId) => likedCatId === catId);
+        },
+        getCatsFromLocalStorage: () => {
+          const storedCats = localStorage.getItem('catsInWishlist')
+            ? JSON.parse(localStorage.getItem('catsInWishlist'))
+            : [];
+          return storedCats;
+        },
+        getQuantityOfCatsInLocalStorage: () => {
+          const catsInWishlistIds = wishlistManager.functions.wishlist.getCatsFromLocalStorage();
+          return catsInWishlistIds.length;
+        },
+        removeCatFromLocalStorage: (catId) => {
+          const catsInWishlistIds = wishlistManager.functions.wishlist.getCatsFromLocalStorage();
+          const catCardEl = document.getElementById(catId).querySelector('.cats__like-btn');
+          const catIndex = catsInWishlistIds.findIndex((likedCatId) => likedCatId === catId);
+          catsInWishlistIds.splice(catIndex, 1);
 
-  return listMarkup;
-};
+          localStorage.setItem('catsInWishlist', JSON.stringify(catsInWishlistIds));
+          catCardEl.classList.remove('liked');
+          wishlistManager.dom.functions.renderCatsInWishlistQuantity();
+        },
+        clearWishlist: () => {
+          localStorage.setItem('catsInWishlist', []);
+          wishlistManager.dom.functions.renderCatsInWishlistQuantity();
+          wishlistManager.dom.functions.resetLikes();
+        },
+        onCatsListClick: (e) => {
+          if (e.target.nodeName !== 'BUTTON') return;
+          const catId = e.target.closest('li').getAttribute('id');
+          const isLiked = e.target.closest('li').querySelector('button').classList.contains('liked');
 
-// WISHLIST
-const getCatsFromLocalStorage = () => {
-  const storedCats = localStorage.getItem('catsInWishlist') ? JSON.parse(localStorage.getItem('catsInWishlist')) : [];
-  return storedCats;
-};
+          isLiked
+            ? wishlistManager.functions.wishlist.removeCatFromLocalStorage(catId)
+            : wishlistManager.functions.wishlist.addCatToLocalStorage(catId);
+        },
+      },
+      pagination: {
+        getNumberOfBtns: () =>
+          Math.ceil(wishlistManager.cfg.totalCatsCountFromAPI / wishlistManager.cfg.catsPerPageLimit),
+        getCurrentPageFromSearchParams: () => {
+          const searchParams = new URLSearchParams(document.location.search);
+          return Number(searchParams.get('page'));
+        },
+        setCurrentPageToSearchParams: (page) => {
+          const searchParams = new URLSearchParams(window.location.search);
+          searchParams.set('page', page);
+          history.replaceState(null, null, '?' + searchParams.toString());
+        },
+        onPaginationClick: async (e) => {
+          if (e.target.nodeName !== 'BUTTON') return;
 
-const addCatToLocalStorage = (catId) => {
-  const catsInWishlistIds = getCatsFromLocalStorage();
-  if (catsInWishlistIds.find((likedCatId) => likedCatId === catId)) return;
+          const page = Number(e.target.dataset.page);
+          if (page === wishlistManager.functions.pagination.getCurrentPageFromSearchParams()) return;
 
-  const catCardEl = document.getElementById(catId).querySelector('.cats__like-btn');
-  catCardEl.classList.add('liked');
-  localStorage.setItem('catsInWishlist', JSON.stringify([...catsInWishlistIds, catId]));
-  renderCatsInWishlistQuantity();
-};
+          wishlistManager.functions.pagination.setCurrentPageToSearchParams(page);
 
-const removeCatFromLocalStorage = (catId) => {
-  const catsInWishlistIds = getCatsFromLocalStorage();
-  const catIndex = catsInWishlistIds.findIndex((likedCatId) => likedCatId === catId);
-  catsInWishlistIds.splice(catIndex, 1);
-  const catCardEl = document.getElementById(catId).querySelector('.cats__like-btn');
+          scrollTo({ behavior: 'smooth', top: 0 });
 
-  localStorage.setItem('catsInWishlist', JSON.stringify(catsInWishlistIds));
-  catCardEl.classList.remove('liked');
-  renderCatsInWishlistQuantity();
-};
+          wishlistManager.dom.functions.renderList();
+          wishlistManager.dom.functions.createPaginationMarkup();
+        },
+      },
+      init: () => {
+        wishlistManager.dom.functions.renderList();
+        wishlistManager.functions.pagination.getCurrentPageFromSearchParams();
+        wishlistManager.dom.functions.renderCatsInWishlistQuantity();
+        wishlistManager.dom.functions.createPaginationMarkup();
 
-const checkIfCatIsInLocalStorage = (catId) => {
-  const catsInWishlistIds = getCatsFromLocalStorage();
-  return catsInWishlistIds.find((likedCatId) => likedCatId === catId);
-};
+        wishlistManager.dom.functions
+          .getCatsCardList()
+          .addEventListener('click', wishlistManager.functions.wishlist.onCatsListClick);
+        wishlistManager.dom.functions
+          .getResetBtnEl()
+          .addEventListener('click', wishlistManager.functions.wishlist.clearWishlist);
+        wishlistManager.dom.functions
+          .getPaginationEl()
+          .addEventListener('click', wishlistManager.functions.pagination.onPaginationClick);
+      },
+    },
+  };
 
-const getQuantityOfCatsInLocalStorage = () => {
-  const catsInWishlistIds = getCatsFromLocalStorage();
-  return catsInWishlistIds.length;
-};
-
-const clearWishlist = () => {
-  localStorage.setItem('catsInWishlist', []);
-  renderCatsInWishlistQuantity();
-  resetLikes();
-};
-
-// PAGINATION
-const paginationEl = document.getElementById('pagination');
-const totalCatsCount = 100;
-const maxPaginationBtnNumber = 7;
-const numberOfBtns = Math.ceil(totalCatsCount / limit);
-
-const gapPaginationBtnMarkup = '<li class="pagination__item">...</li>';
-
-const getCurrentPageFromSearchParams = () => {
-  const searchParams = new URLSearchParams(document.location.search);
-  return Number(searchParams.get('page'));
-};
-
-const setCurrentPageToSearchParams = (page) => {
-  const searchParams = new URLSearchParams(window.location.search);
-  searchParams.set('page', page);
-  history.replaceState(null, null, '?' + searchParams.toString());
-};
-
-const createBtnMarkup = (pageNumber) => {
-  const currentPage = getCurrentPageFromSearchParams();
-  return `<li class="pagination__item">
-    <button data-page="${pageNumber}" class="${pageNumber === currentPage ? 'active' : ''} pagination__button">
-      ${pageNumber}
-    </button>
-  </li>`;
-};
-
-const createPaginationMarkup = () => {
-  let markup = '';
-  const currentPage = getCurrentPageFromSearchParams();
-
-  if (numberOfBtns <= maxPaginationBtnNumber) {
-    for (let i = 1; i <= numberOfBtns; i += 1) {
-      markup += createBtnMarkup(i);
-    }
-  } else if (currentPage < maxPaginationBtnNumber - 2) {
-    for (let i = 1; i <= maxPaginationBtnNumber - 2; i += 1) {
-      markup += createBtnMarkup(i);
-    }
-    markup += gapPaginationBtnMarkup + createBtnMarkup(numberOfBtns);
-  } else if (currentPage > numberOfBtns - maxPaginationBtnNumber + 3) {
-    markup += createBtnMarkup(1) + gapPaginationBtnMarkup;
-    for (let i = numberOfBtns - maxPaginationBtnNumber + 3; i <= numberOfBtns; i += 1) {
-      markup += createBtnMarkup(i);
-    }
-  } else {
-    markup += createBtnMarkup(1) + gapPaginationBtnMarkup;
-    for (let i = currentPage - 1; i <= currentPage + 1; i += 1) {
-      markup += createBtnMarkup(i);
-    }
-    markup += gapPaginationBtnMarkup + createBtnMarkup(numberOfBtns);
-  }
-
-  paginationEl.innerHTML = markup;
-};
-
-const onClick = async (e) => {
-  if (e.target.nodeName !== 'BUTTON') return;
-
-  const page = Number(e.target.dataset.page);
-  if (page === getCurrentPageFromSearchParams()) return;
-
-  setCurrentPageToSearchParams(page);
-
-  scrollTo({ behavior: 'smooth', top: 0 });
-
-  renderList();
-  createPaginationMarkup();
-};
-
-// RENDER
-const renderList = async () => {
-  const page = getCurrentPageFromSearchParams();
-  const cats = await getAllCats(page);
-  const markup = createCatsListMarkup(cats);
-  cardListEl.innerHTML = markup;
-};
-
-const renderCatsInWishlistQuantity = () => {
-  const wishlistConterEl = document.querySelector('.header__favorites-counter');
-  wishlistConterEl.innerText = getQuantityOfCatsInLocalStorage() ? getQuantityOfCatsInLocalStorage() : '';
-};
-
-const resetLikes = () => {
-  const likedButtonsElems = document.querySelectorAll('.liked');
-  likedButtonsElems.forEach((btn) => btn.classList.remove('liked'));
-};
-
-// FUNCTIONS AND LISTENERS
-const onCatsListClick = (e) => {
-  if (e.target.nodeName !== 'BUTTON') return;
-  const catId = e.target.closest('li').getAttribute('id');
-  const isLiked = e.target.closest('li').querySelector('button').classList.contains('liked');
-
-  isLiked ? removeCatFromLocalStorage(catId) : addCatToLocalStorage(catId);
-};
-
-renderCatsInWishlistQuantity();
-getCurrentPageFromSearchParams();
-renderList();
-createPaginationMarkup();
-
-cardListEl.addEventListener('click', onCatsListClick);
-resetButtonEl.addEventListener('click', clearWishlist);
-paginationEl.addEventListener('click', onClick);
+  wishlistManager.functions.init();
+})();
