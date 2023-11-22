@@ -278,6 +278,18 @@ ul {
   font-weight: 500;
 }
 
+.cats__description {
+  display: block;
+  display: -webkit-box;
+  max-height: 80px;
+  line-height: 20px;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+  overflow: hidden!important;
+  -webkit-line-clamp: 4;
+}
+
+
 /* Footer */
 .footer {
   width: 100%;
