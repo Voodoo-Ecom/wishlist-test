@@ -77,7 +77,7 @@ const checkIfCatIsInLocalStorage = (catId) => {
   return catsInWishlistIds.find((likedCatId) => likedCatId === catId);
 };
 
-const getQuantutyOfCatsInLocalStorage = () => {
+const getQuantityOfCatsInLocalStorage = () => {
   const catsInWishlistIds = getCatsFromLocalStorage();
   return catsInWishlistIds.length;
 };
@@ -85,6 +85,7 @@ const getQuantutyOfCatsInLocalStorage = () => {
 const clearWishlist = () => {
   localStorage.setItem('catsInWishlist', []);
   renderCatsInWishlistQuantity();
+  resetLikes();
 };
 
 // PAGINATION
@@ -92,20 +93,22 @@ const paginationEl = document.getElementById('pagination');
 const totalCatsCount = 100;
 const maxPaginationBtnNumber = 7;
 const numberOfBtns = Math.ceil(totalCatsCount / limit);
-let currentPage = 1;
 
 const gapPaginationBtnMarkup = '<li class="pagination__item">...</li>';
 
-const getCurrentPageFromLocalStorage = () => {
-  const storedCurrentPage = localStorage.getItem('currentPage') ? Number(localStorage.getItem('currentPage')) : 1;
-  currentPage = storedCurrentPage;
+const getCurrentPageFromSearchParams = () => {
+  const searchParams = new URLSearchParams(document.location.search);
+  return Number(searchParams.get('page'));
 };
 
-const setCurrentPageToLocalStorage = (page) => {
-  localStorage.setItem('currentPage', page);
+const setCurrentPageToSearchParams = (page) => {
+  const searchParams = new URLSearchParams(window.location.search);
+  searchParams.set('page', page);
+  history.replaceState(null, null, '?' + searchParams.toString());
 };
 
 const createBtnMarkup = (pageNumber) => {
+  const currentPage = getCurrentPageFromSearchParams();
   return `<li class="pagination__item">
     <button data-page="${pageNumber}" class="${pageNumber === currentPage ? 'active' : ''} pagination__button">
       ${pageNumber}
@@ -115,6 +118,7 @@ const createBtnMarkup = (pageNumber) => {
 
 const createPaginationMarkup = () => {
   let markup = '';
+  const currentPage = getCurrentPageFromSearchParams();
 
   if (numberOfBtns <= maxPaginationBtnNumber) {
     for (let i = 1; i <= numberOfBtns; i += 1) {
@@ -145,19 +149,19 @@ const onClick = async (e) => {
   if (e.target.nodeName !== 'BUTTON') return;
 
   const page = Number(e.target.dataset.page);
-  if (page === currentPage) return;
+  if (page === getCurrentPageFromSearchParams()) return;
 
-  currentPage = page;
-  setCurrentPageToLocalStorage(page);
+  setCurrentPageToSearchParams(page);
 
   scrollTo({ behavior: 'smooth', top: 0 });
 
-  renderList(currentPage);
+  renderList();
   createPaginationMarkup();
 };
 
 // RENDER
-const renderList = async (page) => {
+const renderList = async () => {
+  const page = getCurrentPageFromSearchParams();
   const cats = await getAllCats(page);
   const markup = createCatsListMarkup(cats);
   cardListEl.innerHTML = markup;
@@ -165,7 +169,12 @@ const renderList = async (page) => {
 
 const renderCatsInWishlistQuantity = () => {
   const wishlistConterEl = document.querySelector('.header__favorites-counter');
-  wishlistConterEl.innerText = getQuantutyOfCatsInLocalStorage() ? getQuantutyOfCatsInLocalStorage() : '';
+  wishlistConterEl.innerText = getQuantityOfCatsInLocalStorage() ? getQuantityOfCatsInLocalStorage() : '';
+};
+
+const resetLikes = () => {
+  const likedButtonsElems = document.querySelectorAll('.liked');
+  likedButtonsElems.forEach((btn) => btn.classList.remove('liked'));
 };
 
 // FUNCTIONS AND LISTENERS
@@ -178,8 +187,8 @@ const onCatsListClick = (e) => {
 };
 
 renderCatsInWishlistQuantity();
-getCurrentPageFromLocalStorage();
-renderList(currentPage);
+getCurrentPageFromSearchParams();
+renderList();
 createPaginationMarkup();
 
 cardListEl.addEventListener('click', onCatsListClick);
