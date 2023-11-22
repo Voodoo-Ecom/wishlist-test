@@ -4,12 +4,12 @@ const resetButtonEl = document.getElementById('reset-button');
 // API
 const BASE_URL = 'https://api.thecatapi.com/v1/images/search';
 const API_KEY = 'live_ST09boZt58lcEhnCapTTn4JAcUEB72aRfAuLhpU5pxAiAImePNDmuCEvlyaNB56Q';
-const limit = 11;
+const limit = 12;
 
 const getAllCats = async (page = 1) => {
   try {
     const catsData = [];
-    const res = await fetch(`${BASE_URL}?limit=${limit}&has_breeds=1&api_key=${API_KEY}`);
+    const res = await fetch(`${BASE_URL}?limit=${limit}&page=${page}&order=ASC&has_breeds=1&api_key=${API_KEY}`);
     const data = await res.json();
     catsData.push(...data);
     return catsData;
@@ -87,6 +87,75 @@ const clearWishlist = () => {
   renderCatsInWishlistQuantity();
 };
 
+// PAGINATION
+const paginationEl = document.getElementById('pagination');
+const totalCatsCount = 100;
+const maxPaginationBtnNumber = 7;
+const numberOfBtns = Math.ceil(totalCatsCount / limit);
+let currentPage = 1;
+
+const gapPaginationBtnMarkup = '<li class="pagination__item">...</li>';
+
+const getCurrentPageFromLocalStorage = () => {
+  const storedCurrentPage = localStorage.getItem('currentPage') ? Number(localStorage.getItem('currentPage')) : 1;
+  currentPage = storedCurrentPage;
+};
+
+const setCurrentPageToLocalStorage = (page) => {
+  localStorage.setItem('currentPage', page);
+};
+
+const createBtnMarkup = (pageNumber) => {
+  return `<li class="pagination__item">
+    <button data-page="${pageNumber}" class="${pageNumber === currentPage ? 'active' : ''} pagination__button">
+      ${pageNumber}
+    </button>
+  </li>`;
+};
+
+const createPaginationMarkup = () => {
+  let markup = '';
+
+  if (numberOfBtns <= maxPaginationBtnNumber) {
+    for (let i = 1; i <= numberOfBtns; i += 1) {
+      markup += createBtnMarkup(i);
+    }
+  } else if (currentPage < maxPaginationBtnNumber - 2) {
+    for (let i = 1; i <= maxPaginationBtnNumber - 2; i += 1) {
+      markup += createBtnMarkup(i);
+    }
+    markup += gapPaginationBtnMarkup + createBtnMarkup(numberOfBtns);
+  } else if (currentPage > numberOfBtns - maxPaginationBtnNumber + 3) {
+    markup += createBtnMarkup(1) + gapPaginationBtnMarkup;
+    for (let i = numberOfBtns - maxPaginationBtnNumber + 3; i <= numberOfBtns; i += 1) {
+      markup += createBtnMarkup(i);
+    }
+  } else {
+    markup += createBtnMarkup(1) + gapPaginationBtnMarkup;
+    for (let i = currentPage - 1; i <= currentPage + 1; i += 1) {
+      markup += createBtnMarkup(i);
+    }
+    markup += gapPaginationBtnMarkup + createBtnMarkup(numberOfBtns);
+  }
+
+  paginationEl.innerHTML = markup;
+};
+
+const onClick = async (e) => {
+  if (e.target.nodeName !== 'BUTTON') return;
+
+  const page = Number(e.target.dataset.page);
+  if (page === currentPage) return;
+
+  currentPage = page;
+  setCurrentPageToLocalStorage(page);
+
+  scrollTo({ behavior: 'smooth', top: 0 });
+
+  renderList(currentPage);
+  createPaginationMarkup();
+};
+
 // RENDER
 const renderList = async (page) => {
   const cats = await getAllCats(page);
@@ -109,6 +178,10 @@ const onCatsListClick = (e) => {
 };
 
 renderCatsInWishlistQuantity();
-renderList();
+getCurrentPageFromLocalStorage();
+renderList(currentPage);
+createPaginationMarkup();
+
 cardListEl.addEventListener('click', onCatsListClick);
 resetButtonEl.addEventListener('click', clearWishlist);
+paginationEl.addEventListener('click', onClick);
