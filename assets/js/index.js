@@ -24,6 +24,14 @@
       },
     },
     dom: {
+      selectors: {
+        activeLikedBtn: '.liked',
+        catsCardList: '.cats__list',
+        likeBtn: '.cats__like-btn',
+        paginationId: 'pagination',
+        resetButtonId: 'reset-button',
+        wishlistCounter: '.header__favorites-counter',
+      },
       functions: {
         getPaginationEl: () => document.getElementById(wishlistManager.dom.selectors.paginationId),
         getResetBtnEl: () => document.getElementById(wishlistManager.dom.selectors.resetButtonId),
@@ -112,14 +120,6 @@
           const likedButtonsElems = wishlistManager.dom.functions.getLikedButtonsElems();
           likedButtonsElems.forEach((btn) => btn.classList.remove('liked'));
         },
-      },
-      selectors: {
-        catsCardList: '.cats__list',
-        paginationId: 'pagination',
-        wishlistCounter: '.header__favorites-counter',
-        activeLikedBtn: '.liked',
-        resetButtonId: 'reset-button',
-        likeBtn: '.cats__like-btn',
       },
     },
     functions: {
