@@ -12,6 +12,10 @@
   --primary-font: "Roboto", sans-serif;
 }
 
+html {
+  font-size: 16px;
+}
+
 /* Common */
 body {
   display: flex;
@@ -19,7 +23,7 @@ body {
   align-items: stretch;
   min-height: 100vh;
   font-family: var(--primary-font);
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.43;
   color: var(--first-primary-color);
   background-color: var(--bg-primary);
@@ -76,11 +80,13 @@ ul {
   min-width: 320px;
   margin-right: auto;
   margin-left: auto;
-  padding-right: 32px;
-  padding-left: 32px;
+  padding-right: 16px;
+  padding-left: 16px;
   
   @media screen and (min-width: 480px) {
     width: 480px;
+    padding-right: 32px;
+    padding-left: 32px;
   }
 
   @media screen and (min-width: 768px) {
@@ -109,20 +115,20 @@ ul {
 }
 
 .header__logo-link {
-  font-size: 24px;
+  font-size: 1.5rem;
   line-height: 1.33;
   font-weight: 600;
   letter-spacing: 0.48px;
 }
 
 .header__favorites-text {
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.5;
   font-weight: 500;
 }
 
 .header__favorites-counter {
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.33;
   font-weight: 500;
 }
@@ -153,12 +159,16 @@ ul {
 
 .cats__reset-btn {
   display: block;
-  margin-bottom: 52px;
+  margin-bottom: 32px;
   margin-left: auto;
   padding: 8px 24px;
   background-color: var(--white);
   border: 1px solid var(--bg-secondary);
   border-radius: var(--border-radius);
+
+  @media screen and (min-width: 768px) {
+    margin-bottom: 52px;
+  }
 }
 
 .cats__list {
