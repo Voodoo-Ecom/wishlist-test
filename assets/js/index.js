@@ -34,17 +34,6 @@
         colorSwitcher: '.color-switcher',
       },
       functions: {
-        changeThemeClass: () => {
-          const bodyClassList = document.body.classList;
-          if (bodyClassList.contains('dark-theme')) {
-            bodyClassList.remove('dark-theme');
-            bodyClassList.add('light-theme');
-            return;
-          }
-
-          bodyClassList.remove('light-theme');
-          bodyClassList.add('dark-theme');
-        },
         getColorSwitcherEl: () => document.querySelector(wishlistManager.dom.selectors.colorSwitcher),
         getCatsCardList: () => document.querySelector(wishlistManager.dom.selectors.catsCardList),
         getLikeBtnByCatId: (catId) =>
@@ -217,17 +206,33 @@
         },
       },
       colorSwitcher: {
-        onColorSwitcherClick: (e) => {
-          if (e.target.nodeName === 'LABEL') wishlistManager.dom.functions.changeThemeClass();
-        },
-        defineColorMode: () => {
-          const isDarkSchemePrefered = window.matchMedia('(prefers-color-scheme: dark)');
-
-          if (isDarkSchemePrefered.matches) {
+        changeColorMode: (newTheme) => {
+          if (newTheme === 'dark') {
+            document.cookie = 'colorMode=dark';
             document.body.classList.add('dark-theme');
           } else {
+            document.cookie = 'colorMode=light';
             document.body.classList.remove('dark-theme');
           }
+        },
+        defineColorMode: () => {
+          let currentTheme = 'light';
+          const colorModeFromCookies = wishlistManager.helpers.readCookieValue('colorMode');
+
+          if (colorModeFromCookies) {
+            currentTheme = colorModeFromCookies;
+          } else {
+            const isDarkSchemePrefered = window.matchMedia('(prefers-color-scheme: dark)');
+            if (isDarkSchemePrefered.matches) currentTheme = 'dark';
+          }
+
+          wishlistManager.functions.colorSwitcher.changeColorMode(currentTheme);
+        },
+        onColorSwitcherClick: (e) => {
+          if (e.target.nodeName !== 'LABEL') return;
+
+          const newTheme = wishlistManager.helpers.readCookieValue('colorMode') === 'dark' ? 'light' : 'dark';
+          wishlistManager.functions.colorSwitcher.changeColorMode(newTheme);
         },
       },
       init: () => {
@@ -249,6 +254,19 @@
         wishlistManager.dom.functions
           .getPaginationEl()
           .addEventListener('click', wishlistManager.functions.pagination.onPaginationClick);
+      },
+    },
+    helpers: {
+      readCookieValue: (cookieName) => {
+        const cookiesSplittedStr = document.cookie.split('; ');
+        const cookies = {};
+
+        for (let i = 0; i < cookiesSplittedStr.length; i += 1) {
+          const [name, value] = cookiesSplittedStr[i].split('=');
+          cookies[name] = value;
+        }
+
+        return cookies[cookieName] ? cookies[cookieName] : null;
       },
     },
   };
