@@ -3,9 +3,9 @@
     cfg: {
       API_KEY: 'live_ST09boZt58lcEhnCapTTn4JAcUEB72aRfAuLhpU5pxAiAImePNDmuCEvlyaNB56Q',
       BASE_URL: 'https://api.thecatapi.com/v1/images/search',
-      totalCatsCountFromAPI: 100,
-      maxPaginationBtnNumber: 7,
       catsPerPageLimit: 12,
+      maxPaginationBtnNumber: 7,
+      totalCatsCountFromAPI: 100,
     },
     catsApi: {
       getAllCats: async (page = 1) => {
@@ -31,8 +31,21 @@
         paginationId: 'pagination',
         resetButtonId: 'reset-button',
         wishlistCounter: '.header__favorites-counter',
+        colorSwitcher: '.color-switcher',
       },
       functions: {
+        changeThemeClass: () => {
+          const bodyClassList = document.body.classList;
+          if (bodyClassList.contains('dark-theme')) {
+            bodyClassList.remove('dark-theme');
+            bodyClassList.add('light-theme');
+            return;
+          }
+
+          bodyClassList.remove('light-theme');
+          bodyClassList.add('dark-theme');
+        },
+        getColorSwitcherEl: () => document.querySelector(wishlistManager.dom.selectors.colorSwitcher),
         getCatsCardList: () => document.querySelector(wishlistManager.dom.selectors.catsCardList),
         getLikeBtnByCatId: (catId) =>
           document.getElementById(catId).querySelector(wishlistManager.dom.selectors.likeBtn),
@@ -203,12 +216,20 @@
           wishlistManager.dom.functions.createPaginationMarkup();
         },
       },
+      colorSwitcher: {
+        onColorSwitcherClick: (e) => {
+          if (e.target.nodeName === 'LABEL') wishlistManager.dom.functions.changeThemeClass();
+        },
+      },
       init: () => {
         wishlistManager.dom.functions.renderList();
         wishlistManager.functions.pagination.getCurrentPageFromSearchParams();
         wishlistManager.dom.functions.renderCatsInWishlistQuantity();
         wishlistManager.dom.functions.createPaginationMarkup();
 
+        wishlistManager.dom.functions
+          .getColorSwitcherEl()
+          .addEventListener('click', wishlistManager.functions.colorSwitcher.onColorSwitcherClick);
         wishlistManager.dom.functions
           .getCatsCardList()
           .addEventListener('click', wishlistManager.functions.wishlist.onCatsListClick);
