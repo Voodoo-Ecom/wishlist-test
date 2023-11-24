@@ -220,12 +220,22 @@
         onColorSwitcherClick: (e) => {
           if (e.target.nodeName === 'LABEL') wishlistManager.dom.functions.changeThemeClass();
         },
+        defineColorMode: () => {
+          const isDarkSchemePrefered = window.matchMedia('(prefers-color-scheme: dark)');
+
+          if (isDarkSchemePrefered.matches) {
+            document.body.classList.add('dark-theme');
+          } else {
+            document.body.classList.remove('dark-theme');
+          }
+        },
       },
       init: () => {
         wishlistManager.dom.functions.renderList();
         wishlistManager.functions.pagination.getCurrentPageFromSearchParams();
         wishlistManager.dom.functions.renderCatsInWishlistQuantity();
         wishlistManager.dom.functions.createPaginationMarkup();
+        wishlistManager.functions.colorSwitcher.defineColorMode();
 
         wishlistManager.dom.functions
           .getColorSwitcherEl()
