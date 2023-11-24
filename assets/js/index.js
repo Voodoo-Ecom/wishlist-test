@@ -7,6 +7,19 @@
       maxPaginationBtnNumber: 7,
       totalCatsCountFromAPI: 100,
     },
+    helpers: {
+      readCookieValue: (cookieName) => {
+        const cookiesSplittedStr = document.cookie.split('; ');
+        const cookies = {};
+
+        for (let i = 0; i < cookiesSplittedStr.length; i += 1) {
+          const [name, value] = cookiesSplittedStr[i].split('=');
+          cookies[name] = value;
+        }
+
+        return cookies[cookieName] ? cookies[cookieName] : null;
+      },
+    },
     catsApi: {
       getAllCats: async (page = 1) => {
         try {
@@ -255,19 +268,6 @@
         wishlistManager.dom.functions
           .getPaginationEl()
           .addEventListener('click', wishlistManager.functions.pagination.onPaginationClick);
-      },
-    },
-    helpers: {
-      readCookieValue: (cookieName) => {
-        const cookiesSplittedStr = document.cookie.split('; ');
-        const cookies = {};
-
-        for (let i = 0; i < cookiesSplittedStr.length; i += 1) {
-          const [name, value] = cookiesSplittedStr[i].split('=');
-          cookies[name] = value;
-        }
-
-        return cookies[cookieName] ? cookies[cookieName] : null;
       },
     },
   };
