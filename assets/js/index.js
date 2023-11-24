@@ -227,6 +227,7 @@
           }
 
           wishlistManager.functions.colorSwitcher.changeColorMode(currentTheme);
+          wishlistManager.dom.functions.getColorSwitcherEl().classList.remove('visibly-hidden');
         },
         onColorSwitcherClick: (e) => {
           if (e.target.nodeName !== 'LABEL') return;

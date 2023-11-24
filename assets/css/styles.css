@@ -160,6 +160,13 @@ ul {
   left: calc(100% - 24px);
 }
 
+.color-switcher.visibly-hidden {
+  width: 0;
+  height: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 /* Skeleton */
 .cats__image-wrapper--skeleton {
   width: 100%;
